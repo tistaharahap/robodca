@@ -1,0 +1,39 @@
+@startuml
+
+title RoboDCA General Flow
+
+== Candles TA ==
+
+RoboDCA -> Exchange: Get the last 529 candles periodically (TF + 1 tick)
+Exchange -> RoboDCA: Response with candles
+RoboDCA -> "TA Service": Delegate TA calculations
+"TA Service" -> "TA Service": Generate BBWLv4 Balance Line
+"TA Service" -> "TA Service": Generate EMA528 from Balance Lines
+"TA Service" -> "TA Service": Determine if last price is in buy zone or under the zone
+"TA Service" -> RoboDCA: Response with recommendation to buy or not to buy
+
+== Buy Recommendation ==
+
+RoboDCA -> "Buyer Service": Request with recommendation to buy
+"Buyer Service" -> Exchange: Check account balance
+Exchange -> "Buyer Service": Response with account balance
+"Buyer Service" -> Exchange: Market buy crypto with configured quantity
+Exchange -> "Buyer Service": Transaction response
+"Buyer Service" -> "Notification Service": Notify user about the buy transaction
+"Notification Service" -> "Notification Service": Get configuration for all notification channels for the user
+"Notification Service" -> "Channel API": Send notification payload
+"Channel API" -> User: Send message
+
+== Withdrawals ==
+
+"Buyer Service" -> Exchange: Check account balance
+Exchange -> "Buyer Service": Response with account balance
+"Buyer Service" -> "Buyer Service": Determine if account is over configured minimum withdrawal quantity
+"Buyer Service" -> Exchange: Withdrawal request to cold wallet
+Exchange -> "Buyer Service": Response with withdrawal transaction
+"Buyer Service" -> "Notification Service": Notify user about the withdrawal
+"Notification Service" -> "Notification Service": Get configuration for all notification channels for the user
+"Notification Service" -> "Channel API": Send notification payload
+"Channel API" -> User: Send message
+
+@enduml
