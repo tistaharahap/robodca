@@ -12,10 +12,13 @@ class StrategyRecommendation(Enum):
 
 class Strategy(object):
 
-    def __init__(self, pair, candle_count: int = 529):
+    def __init__(self, pair: str, timeframe: str, candle_count: int = 529):
         self.pair = pair
+        self.timeframe = timeframe
         self.candle_count = candle_count
+
         self.ohlcv = []
+        self.indicators = {}
 
     @abstractmethod
     async def get_recommendation(self) -> StrategyRecommendation:
